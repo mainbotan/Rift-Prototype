@@ -11,7 +11,7 @@
  */
 
 return [
-    'name' => 'Huila',
+    'name' => 'Rift Dev Mode',
     'version' => '1.0.0',
     'mode' => 'dev'
 ];

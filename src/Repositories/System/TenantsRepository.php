@@ -4,7 +4,7 @@ namespace App\Repositories\System;
 
 use PDO;
 use PDOStatement;
-use Rift\Core\Contracts\OperationOutcome;
+use Rift\Core\Databus\OperationOutcome;
 use Rift\Core\Repositories\AbstractRepository;
 
 class TenantsRepository extends AbstractRepository
@@ -22,6 +22,12 @@ class TenantsRepository extends AbstractRepository
         $stmt->bindValue(':status', $data['status'], PDO::PARAM_STR);
         $stmt->bindValue(':plan_id', $data['plan_id'], PDO::PARAM_INT);
         
+        return $this->executeQuery($stmt);
+    }
+    public function getTenantIdByEmail(string $email): OperationOutcome 
+    {
+        $stmt = $this->pdo->prepare("SELECT id FROM tenants WHERE email=:email");
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
         return $this->executeQuery($stmt);
     }
 }
