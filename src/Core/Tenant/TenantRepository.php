@@ -3,11 +3,10 @@
 namespace App\Repositories\System;
 
 use PDO;
-use PDOStatement;
 use Rift\Core\Databus\OperationOutcome;
-use Rift\Core\Repositories\AbstractRepository;
+use Rift\Core\Repositories\Repository;
 
-class TenantsRepository extends AbstractRepository
+class TenantsRepository extends Repository
 {
     public function createTenant(array $data): OperationOutcome
     {

@@ -15,6 +15,11 @@ $routesBox = new RoutesBox();
 
 # single
 
+$routesBox->group('/testing', function(RoutesBox $box) {
+    $box->get('/connector', App\Core\Testing\ConnectorTest::class);
+    $box->get('/deploy-schemas', App\Core\Testing\DeployShemas::class);
+});
+
 // $routesBox->get('/tokenInfo', App\UseCases\TokenInfo::class)
 //     ->middleware(App\Middlewares\CheckHeader::class)
 //     ->middleware(App\Middlewares\AuthClient::class);
