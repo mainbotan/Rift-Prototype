@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Middlewares;
+namespace App\Core\Middlewares;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Middlewares\MiddlewareInterface;

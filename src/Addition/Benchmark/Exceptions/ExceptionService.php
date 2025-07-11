@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Benchmark\Exceptions;
+namespace App\Addition\Benchmark\Exceptions;
 
 class ExceptionService
 {

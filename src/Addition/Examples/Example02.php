@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Examples;
+namespace App\Addition\Examples;
 
 use Rift\Core\Databus\Operation;
 use Rift\Core\Databus\OperationOutcome;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Benchmark\OperationOutcome;
+namespace App\Addition\Benchmark\OperationOutcome;
 
 use Rift\Core\Databus\Operation;
 use Rift\Core\Databus\OperationOutcome;
