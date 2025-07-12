@@ -6,10 +6,12 @@ use Rift\Core\Models\Model;
 
 class TenantModel extends Model {
     
+    public static function getTableName(): string { return 'tenants'; }
+
     public static function getSchema(): array
     {
         return [
-            'id' => [
+            'uid' => [
                 'type' => 'int',
                 'db_type' => 'SERIAL PRIMARY KEY'
             ],
@@ -24,18 +26,12 @@ class TenantModel extends Model {
                     return filter_var($value, FILTER_VALIDATE_EMAIL);
                 }
             ],
-            'password' => [
+            'finger' => [
                 'type' => 'string',
                 'min' => 8,
                 'max' => 64,
                 'required' => true,
                 'db_type' => 'VARCHAR(64) NOT NULL'
-            ],
-            'status' => [
-                'type' => 'string',
-                'enum' => ['active', 'pending', 'banned'],
-                'default' => 'pending',
-                'db_type' => 'VARCHAR(20) DEFAULT \'pending\''
             ]
         ];
     }

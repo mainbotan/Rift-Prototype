@@ -6,6 +6,8 @@ use Rift\Core\Databus\OperationOutcome;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Database\Configurators\ConfiguratorInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
+use App\Core\Tenant\BetaTenantModel;
+use Rift\Core\Databus\Operation;
 
 class DeployShemas implements HandlerInterface {
     public function __construct(
