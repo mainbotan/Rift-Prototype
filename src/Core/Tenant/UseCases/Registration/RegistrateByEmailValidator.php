@@ -17,8 +17,8 @@ class RegistrateByEmailValidator implements ValidatorInterface {
             'min' => 4,
             'max' => 64
         ],
-        'finger' => [
-        '    type' => 'string',
+        'password' => [
+            'type' => 'string',
             'min' => 4,
             'max' => 64
         ]

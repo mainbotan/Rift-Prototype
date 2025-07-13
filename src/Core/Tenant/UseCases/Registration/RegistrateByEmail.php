@@ -10,49 +10,81 @@ use Rift\Contracts\Handlers\HandlerInterface;
 use Rift\Crypto\JwtManager;
 use Rift\Core\Databus\Operation;
 use Rift\Core\Databus\OperationOutcome;
-use Rift\Crypto\UID;
+use Rift\Crypto\HashManager;
+use Rift\Crypto\UidManager;
+use Symfony\Component\Stopwatch\Stopwatch;
+use Rift\Metrics\Stopwatch\StopwatchManager;
 
 class RegistrateByEmail implements HandlerInterface {
     public function __construct(
         private RegistrateByEmailValidator $validator,
         private RepositoriesRouter $repositoriesRouter,
-        private UID $UID,
-        private JwtManager $jwtManager
+        private UidManager $uidManager,
+        private JwtManager $jwtManager,
+        private HashManager $hashManager,
+        private Stopwatch $stopwatch,
+        private StopwatchManager $stopwatchManager
     ) { }
 
     public function execute(ServerRequestInterface $request): OperationOutcome {
+
+        // stopwatch
+        $this->stopwatch->start('reg.total');
+
         $requestBody = $request->getParsedBody();
-        
+
+        $this->stopwatch->start('reg.validation');
         return $this->validator->validate($requestBody)
-            
+            ->tap(fn() => $this->stopwatch->stop('reg.validation'))                                                  
+                                 
+            ->tap(fn() => $this->stopwatch->start('reg.repo_unit')) 
             ->then(fn() => $this->repositoriesRouter->factory())
             ->then(fn(RepositoriesFactory $factory) => $factory->tenants())
+            ->tap(fn() => $this->stopwatch->stop('reg.repo_unit'))                         
+            
             ->ensure(
                 function(TenantRepository $repository) use ($requestBody) {
+                    $this->stopwatch->start('reg.email_check');
                     $existing = $repository->getTenantUidByEmail($requestBody['email'])->result;
+                    $this->stopwatch->stop('reg.email_check');
+
                     return !isset($existing[0]['uid']);
                 },
                 'A client with the same email already exists. If it was you, log in to access your account.',
                 Operation::HTTP_CONFLICT
             )
             ->then(function(TenantRepository $repository) use ($requestBody) {
-                $uid = $this->UID->generate();
+
+                $this->stopwatch->start('reg.uid_gen');
+                $uid = $this->uidManager->generate();
+                $this->stopwatch->stop('reg.uid_gen');
+
+                $this->stopwatch->start('reg.hash');
+                $hash = $this->hashManager->passwordHash($requestBody['password']);
+                $this->stopwatch->stop('reg.hash');
+
                 return $repository->createTenant([
                     'uid' => $uid,
                     'email' => $requestBody['email'],
-                    'finger' => $requestBody['finger']
+                    'hash' => $hash
                 ])
-                ->map(fn() => ['uid' => $uid]); // Преобразуем успешный результат
+                ->map(fn() => ['uid' => $uid]);
             })
+
+            ->tap(fn() => $this->stopwatch->start('reg.jwt_gen'))
             ->then(function(array $jwtData) {
                 return $this->jwtManager->encode($jwtData)
                     ->map(fn($token) => [
                         'token' => $token,
                         'uid' => $jwtData['uid']
-                    ]);
+                    ])
+                    ->tap(fn() => $this->stopwatch->stop('reg.jwt_gen'))
+                    ->tap(fn() => $this->stopwatch->stop('reg.total'))
+                    ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'reg.total'));
             })
             ->catch(function($error, $code) {
-                return Operation::error($code, "Registration failed: $error");
+                return Operation::error($code, "Registration failed: $error")
+                    ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'reg.total'));
             });
     }
 }

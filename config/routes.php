@@ -15,10 +15,14 @@ $routesBox = new RoutesBox();
 
 # Tenant
 $routesBox->group('/v1', function(RoutesBox $box) {
-    $box->middleware(App\Core\Middlewares\ParseJsonBody::class); // Request body parsing
-
     $box->group('/reg', function(RoutesBox $box) {
+        $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
         $box->post('/byEmail', App\Core\Tenant\UseCases\Registration\RegistrateByEmail::class);
+    });
+
+    $box->group('/account', function(RoutesBox $box) {  
+        $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);
+        $box->post('/editPassword', App\Core\Tenant\UseCases\Account\EditPassword::class);
     });
 });
 

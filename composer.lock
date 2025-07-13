@@ -950,7 +950,7 @@
             "dist": {
                 "type": "path",
                 "url": "../core",
-                "reference": "1c6be00f83ea9082852234f9ef1414d0e43e498e"
+                "reference": "0271b75840f929330ba6b1da02fafd08e0dc97c1"
             },
             "require": {
                 "ext-openssl": "*",
@@ -980,7 +980,8 @@
                     "Rift\\Contracts\\": "contracts/",
                     "Rift\\Console\\": "console/",
                     "Rift\\Validator\\": "modules/validator/",
-                    "Rift\\Crypto\\": "modules/crypto/"
+                    "Rift\\Crypto\\": "modules/crypto/",
+                    "Rift\\Metrics\\": "modules/metrics/"
                 }
             },
             "autoload-dev": {

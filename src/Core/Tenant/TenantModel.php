@@ -28,12 +28,11 @@ class TenantModel extends Model {
                     return filter_var($value, FILTER_VALIDATE_EMAIL);
                 }
             ],
-            'finger' => [
+            'hash' => [
                 'type' => 'string',
                 'min' => 8,
-                'max' => 64,
-                'required' => true,
-                'db_type' => 'VARCHAR(64) NOT NULL'
+                'max' => 256,
+                'db_type' => 'VARCHAR(256) NOT NULL'
             ]
         ];
     }

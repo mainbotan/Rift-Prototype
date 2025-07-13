@@ -11,13 +11,13 @@ class TenantRepository extends Repository
     public function createTenant(array $data): OperationOutcome
     {
         $stmt = $this->pdo->prepare("
-            INSERT INTO tenants (uid, email, finger) 
-            VALUES (:uid, :email, :finger)
+            INSERT INTO tenants (uid, email, hash) 
+            VALUES (:uid, :email, :hash)
         ");
         
         $stmt->bindValue(':uid', $data['uid'], PDO::PARAM_STR);
         $stmt->bindValue(':email', $data['email'], PDO::PARAM_STR);
-        $stmt->bindValue(':finger', $data['finger'], PDO::PARAM_STR);
+        $stmt->bindValue(':hash', $data['hash'], PDO::PARAM_STR);
         
         return $this->executeQuery($stmt);
     }
