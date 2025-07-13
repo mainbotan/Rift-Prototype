@@ -12,8 +12,10 @@ class TenantModel extends Model {
     {
         return [
             'uid' => [
-                'type' => 'int',
-                'db_type' => 'SERIAL PRIMARY KEY'
+                'type' => 'string',
+                'min' => 4,
+                'max' => 64,
+                'db_type' => 'VARCHAR(64) NOT NULL UNIQUE'
             ],
             'email' => [
                 'type' => 'string',

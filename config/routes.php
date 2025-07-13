@@ -18,7 +18,7 @@ $routesBox->group('/v1', function(RoutesBox $box) {
     $box->middleware(App\Core\Middlewares\ParseJsonBody::class); // Request body parsing
 
     $box->group('/reg', function(RoutesBox $box) {
-        $box->post('/byEmail', App\Core\Tenant\Handlers\Registration\RegistrateByEmail::class);
+        $box->post('/byEmail', App\Core\Tenant\UseCases\Registration\RegistrateByEmail::class);
     });
 });
 

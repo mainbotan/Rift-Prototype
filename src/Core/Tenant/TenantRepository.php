@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Repositories\System;
+namespace App\Core\Tenant;
 
 use PDO;
 use Rift\Core\Databus\OperationOutcome;
 use Rift\Core\Repositories\Repository;
 
-class TenantsRepository extends Repository
+class TenantRepository extends Repository
 {
     public function createTenant(array $data): OperationOutcome
     {
