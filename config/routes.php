@@ -22,8 +22,6 @@ $routesBox->group('/v1', function(RoutesBox $box) {
     });
 });
 
-
-
 $routesBox->group('/testing', function(RoutesBox $box) {
     $box->get('/connector', App\Core\Testing\ConnectorTest::class);
     $box->get('/deploy-schemas', App\Core\Testing\DeployShemas::class);
