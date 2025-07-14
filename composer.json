@@ -1,8 +1,7 @@
 {
   "name": "rift/test-app",
   "require": {
-    "rift/core": "@dev",
-    "symfony/mailer": "^7.3"
+    "rift/core": "@dev"
   },
   "repositories": [
     {

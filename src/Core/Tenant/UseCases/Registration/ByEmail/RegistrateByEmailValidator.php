@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Tenant\UseCases\Registration;
+namespace App\Core\Tenant\UseCases\Registration\ByEmail;
 
 use Rift\Contracts\Validators\ValidatorInterface;
 use Rift\Core\Databus\OperationOutcome;

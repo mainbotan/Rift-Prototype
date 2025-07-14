@@ -3,7 +3,6 @@
 namespace App\Core\Tenant\UseCases\Authorization\ByEmail;
 
 use App\Core\RepositoriesRouter;
-use App\Core\Tenant\UseCases\Registration\RegistrateByEmailValidator;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
 use Rift\Core\Databus\OperationOutcome;
@@ -12,6 +11,8 @@ use Rift\Metrics\Stopwatch\StopwatchManager;
 use Symfony\Component\Stopwatch\Stopwatch;
 use App\Core\RepositoriesFactory;
 use App\Core\Tenant\TenantRepository;
+use App\Core\Tenant\UseCases\Registration\ByEmail\GenerateVerifyJwtTokenValidator;
+use App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmailValidator;
 use Rift\Core\Databus\Operation;
 
 class AuthByEmail implements HandlerInterface {

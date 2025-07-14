@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Tenant\UseCases\Registration;
+namespace App\Core\Tenant\UseCases\Registration\ByEmail;
 
 use App\Core\RepositoriesFactory;
 use App\Core\RepositoriesRouter;
@@ -77,10 +77,34 @@ class RegistrateByEmail implements HandlerInterface {
             ->then(function(array $jwtData) {
                 return $this->jwtManager->encode($jwtData)
                     ->map(fn($token) => [
-                        'token' => $token,
+                        'auth' => [
+                            'token' => $token
+                        ],
                         'uid' => $jwtData['uid']
+                    ]);
+            })
+            ->tap(fn() => $this->stopwatch->stop('reg.jwt_gen'))
+
+            ->then(function($result) use ($requestBody) {
+
+                $this->stopwatch->start('reg.verify_code_gen');
+                $verifyCode = random_int(100000, 999999);
+                $this->stopwatch->stop('reg.verify_code_gen');
+
+                $this->stopwatch->start('reg.verify_code_send');
+                $this->mailer->sendConfirmationEmail($requestBody['email'], $verifyCode);
+                $this->stopwatch->stop('reg.verify_code_send');
+
+                return $this->jwtManager->encode([
+                        'uid' => $result['uid'],
+                        'code' => $verifyCode
                     ])
-                    ->tap(fn() => $this->stopwatch->stop('reg.jwt_gen'))
+                    ->map(fn($verifyToken) => [
+                        'auth' => $result['auth'],
+                        'verify' => [
+                            'token' => $verifyToken
+                        ]
+                    ])
                     ->tap(fn() => $this->stopwatch->stop('reg.total'))
                     ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'reg.total'));
             })

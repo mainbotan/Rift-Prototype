@@ -9,13 +9,12 @@ class MailerService {
     public function __construct(
         private MailerInterface $mailer
     ) { }
-    public function sendConfirmationEmail(string $to): void {
+    public function sendConfirmationEmail(string $to, int $code): void {
         $email = (new Email())
             ->from('noreply@yourdomain.com')
             ->to($to)
             ->subject('Подтверждение регистрации')
-            ->text('Пожалуйста, подтвердите ваш email')
-            ->html('хуесосы');
+            ->text("Код подтверждения: {$code}.");
 
         $this->mailer->send($email);
     }
