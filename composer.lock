@@ -950,7 +950,7 @@
             "dist": {
                 "type": "path",
                 "url": "../core",
-                "reference": "0271b75840f929330ba6b1da02fafd08e0dc97c1"
+                "reference": "6609d65726d197edbd5e96142b196ecfe6976877"
             },
             "require": {
                 "ext-openssl": "*",
@@ -1879,7 +1879,7 @@
     },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": {},
-    "platform-dev": {},
+    "platform": [],
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

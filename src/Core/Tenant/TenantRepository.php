@@ -21,6 +21,12 @@ class TenantRepository extends Repository
         
         return $this->executeQuery($stmt);
     }
+    public function getTenantUidAndHashByEmail(string $email): OperationOutcome 
+    {
+        $stmt = $this->pdo->prepare("SELECT uid, hash FROM tenants WHERE email=:email");
+        $stmt->bindValue(':email', $email, PDO::PARAM_STR);
+        return $this->executeQuery($stmt);
+    }
     public function getTenantUidByEmail(string $email): OperationOutcome 
     {
         $stmt = $this->pdo->prepare("SELECT uid FROM tenants WHERE email=:email");
