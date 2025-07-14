@@ -11,6 +11,7 @@ use Rift\Contracts\Handlers\HandlerInterface;
 use Rift\Crypto\JwtManager;
 use Rift\Core\Databus\Operation;
 use Rift\Core\Databus\OperationOutcome;
+use Rift\Crypto\EncryptionManager;
 use Rift\Crypto\HashManager;
 use Rift\Crypto\UidManager;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -25,7 +26,8 @@ class RegistrateByEmail implements HandlerInterface {
         private HashManager $hashManager,
         private Stopwatch $stopwatch,
         private StopwatchManager $stopwatchManager,
-        private MailerService $mailer
+        private MailerService $mailer,
+        private EncryptionManager $encryptionManager
     ) { }
 
     public function execute(ServerRequestInterface $request): OperationOutcome {
@@ -91,14 +93,23 @@ class RegistrateByEmail implements HandlerInterface {
                 $verifyCode = random_int(100000, 999999);
                 $this->stopwatch->stop('reg.verify_code_gen');
 
-                $this->stopwatch->start('reg.verify_code_send');
-                $this->mailer->sendConfirmationEmail($requestBody['email'], $verifyCode);
-                $this->stopwatch->stop('reg.verify_code_send');
+                $this->stopwatch->start('reg.verify_code_encrypt');
+                return $this->encryptionManager->encrypt($verifyCode)
+                    ->tap(fn() => $this->stopwatch->stop('reg.verify_code_encrypt'))
 
-                return $this->jwtManager->encode([
-                        'uid' => $result['uid'],
-                        'code' => $verifyCode
-                    ])
+                    ->tap(fn() => $this->stopwatch->start('reg.verify_code_send'))
+                    ->then(function($encryptedVerifyCode) use ($requestBody, $verifyCode) {
+                        $this->mailer->sendConfirmationEmail($requestBody['email'], $verifyCode);
+                        return Operation::success($encryptedVerifyCode);
+                    })
+                    ->tap(fn() => $this->stopwatch->stop('reg.verify_code_send'))
+
+                    ->then(function ($encryptedVerifyCode) use ($result) {
+                        return $this->jwtManager->encode([
+                            'uid' => $result['uid'],
+                            'code' => $encryptedVerifyCode
+                        ]);
+                    })
                     ->map(fn($verifyToken) => [
                         'auth' => $result['auth'],
                         'verify' => [

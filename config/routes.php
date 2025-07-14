@@ -23,6 +23,11 @@ $routesBox->group('/v1', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
         $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class);
     });
+    $box->group('/verify', function(RoutesBox $box) {
+        $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
+        $box->post('/email', App\Core\Tenant\UseCases\Registration\ByEmail\VerifyEmail::class);
+    });
+
     $box->group('/account', function(RoutesBox $box) {  
         $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);
         $box->post('/editPassword', App\Core\Tenant\UseCases\Account\EditPassword::class);
