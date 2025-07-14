@@ -58,6 +58,13 @@ services:
       PMA_PASSWORD: ${DB_PASSWORD:-root}
     depends_on:
       - mysql
+    
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    ports:
+      - "1025:1025" # SMTP порт для отправки писем
+      - "8025:8025" # Web UI
 
 volumes:
   mysql_data:

@@ -4,6 +4,7 @@ namespace App\Core\Tenant\UseCases\Registration;
 
 use App\Core\RepositoriesFactory;
 use App\Core\RepositoriesRouter;
+use App\Core\Tenant\Services\MailerService;
 use App\Core\Tenant\TenantRepository;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
@@ -23,7 +24,8 @@ class RegistrateByEmail implements HandlerInterface {
         private JwtManager $jwtManager,
         private HashManager $hashManager,
         private Stopwatch $stopwatch,
-        private StopwatchManager $stopwatchManager
+        private StopwatchManager $stopwatchManager,
+        private MailerService $mailer
     ) { }
 
     public function execute(ServerRequestInterface $request): OperationOutcome {
