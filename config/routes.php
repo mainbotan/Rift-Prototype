@@ -23,7 +23,7 @@ $routesBox->group('/v1', function(RoutesBox $box) {
     });
     $box->group('/auth', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(100);
+        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(6);
     });
     $box->group('/verify', function(RoutesBox $box) {
         $box->post('/email', App\Core\Tenant\UseCases\Registration\ByEmail\VerifyEmail::class)->limit(100);
