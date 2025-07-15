@@ -65,6 +65,21 @@ services:
     ports:
       - "1025:1025" # SMTP порт для отправки писем
       - "8025:8025" # Web UI
+  
+  redis:
+    image: redis:alpine
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
 
 volumes:
   mysql_data:
+  redis_data:

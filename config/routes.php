@@ -15,7 +15,7 @@ $routesBox = new RoutesBox();
 
 # Tenant
 $routesBox->group('/v1', function(RoutesBox $box) {
-    $box->middleware(App\Core\Middlewares\RateLimiting::class);
+    $box->middleware(Rift\Core\Http\RateLimiter\RateLimitMiddleware::class);
 
     $box->group('/reg', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
@@ -23,12 +23,11 @@ $routesBox->group('/v1', function(RoutesBox $box) {
     });
     $box->group('/auth', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(200);
+        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(100);
     });
     $box->group('/verify', function(RoutesBox $box) {
-        $box->post('/email', App\Core\Tenant\UseCases\Registration\ByEmail\VerifyEmail::class);
+        $box->post('/email', App\Core\Tenant\UseCases\Registration\ByEmail\VerifyEmail::class)->limit(100);
     });
-
     $box->group('/account', function(RoutesBox $box) {  
         $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);
         $box->post('/editPassword', App\Core\Tenant\UseCases\Account\EditPassword::class);

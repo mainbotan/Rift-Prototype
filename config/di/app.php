@@ -1,8 +1,10 @@
 <?php
 
+use Rift\Contracts\Cache\CacheInterface;
 use Rift\Contracts\Http\ResponseEmitter\EmitterInterface;
 use Rift\Contracts\Http\Router\RouterInterface;
 use Rift\Contracts\Http\RoutesBox\RoutesBoxInterface;
+use Rift\Core\Cache\Redis\RedisCacheService;
 use Rift\Core\Http\ResponseEmitters\CompositeEmitter;
 use Rift\Core\Http\Router\Router;
 use Symfony\Component\Mailer\Mailer;
@@ -19,6 +21,7 @@ $bonding = [
     RouterInterface::class => get(Router::class),
     RoutesBoxInterface::class => require __DIR__ . '/../routes.php',
     MailerInterface::class => get(Mailer::class),
+    CacheInterface::class => get(RedisCacheService::class),
 
     // Symfony Mailer
     TransportInterface::class => function () {
