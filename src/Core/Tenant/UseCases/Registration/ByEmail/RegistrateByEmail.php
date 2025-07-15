@@ -17,6 +17,11 @@ use Rift\Crypto\UidManager;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Rift\Metrics\Stopwatch\StopwatchManager;
 
+/**
+ * POST email 
+ * POST password
+ * @version 1.0.0
+ */
 class RegistrateByEmail implements HandlerInterface {
     public function __construct(
         private RegistrateByEmailValidator $validator,

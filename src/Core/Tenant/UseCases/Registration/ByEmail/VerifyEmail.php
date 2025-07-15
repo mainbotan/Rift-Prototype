@@ -16,11 +16,14 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * GET token [verify token with encrypted code + uid]
+ * X-Verification-Code [verification code]
  * @version 1.0.0
  */
 class VerifyEmail implements HandlerInterface {
 
     const VERIFIED_STATUS = 'verified';
+    
+    const VERIFY_HEADER = 'X-Verification-Code';
 
     public function __construct(
         private VerifyEmailValidator $validator,
@@ -42,10 +45,11 @@ class VerifyEmail implements HandlerInterface {
             return Operation::error(Operation::HTTP_BAD_REQUEST, 'Verify token lost.');
         }
         $verifyToken = $queryParams['token'];
-        $requestBody = $request->getParsedBody();
-
+        
+        $clientCode = $request->getHeader(self::VERIFY_HEADER)[0];
+        
         $this->stopwatch->start('verify.validation');
-        return $this->validator->validate($requestBody)
+        return $this->validator->validate(['code' => $clientCode])
             ->tap(fn() => $this->stopwatch->stop('verify.validation'))                                                  
 
             ->tap(fn() => $this->stopwatch->start('verify.token_decode'))
@@ -60,7 +64,7 @@ class VerifyEmail implements HandlerInterface {
             }, 'Verification token expired.', Operation::HTTP_UNAUTHORIZED)
             ->tap(fn() => $this->stopwatch->stop('verify.token_check_exp'))
             
-            ->then(function ($jwtData) use ($requestBody) {
+            ->then(function ($jwtData) use ($clientCode) {
 
                 $uid = $jwtData['uid'];
 
@@ -69,8 +73,8 @@ class VerifyEmail implements HandlerInterface {
                     ->tap(fn() => $this->stopwatch->stop('verify.code_decode'))
 
                     ->tap(fn() => $this->stopwatch->start('verify.match_codes'))
-                    ->then(function($decodedCode) use ($requestBody, $jwtData) {
-                        if ((string) $decodedCode !== (string) $requestBody['code']) {
+                    ->then(function($decodedCode) use ($clientCode, $jwtData) {
+                        if ((string) $decodedCode !== (string) $clientCode) {
                             return Operation::error(Operation::HTTP_UNAUTHORIZED, 'Mismatch of verification codes.');
                         }
                         return Operation::success($jwtData['uid']);

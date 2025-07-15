@@ -15,16 +15,17 @@ $routesBox = new RoutesBox();
 
 # Tenant
 $routesBox->group('/v1', function(RoutesBox $box) {
+    $box->middleware(App\Core\Middlewares\RateLimiting::class);
+
     $box->group('/reg', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->post('/byEmail', App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmail::class);
+        $box->post('/byEmail', App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmail::class)->limit(100);
     });
     $box->group('/auth', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class);
+        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(200);
     });
     $box->group('/verify', function(RoutesBox $box) {
-        $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
         $box->post('/email', App\Core\Tenant\UseCases\Registration\ByEmail\VerifyEmail::class);
     });
 
