@@ -33,7 +33,14 @@ class TenantModel extends Model {
                 'min' => 8,
                 'max' => 256,
                 'db_type' => 'VARCHAR(256) NOT NULL'
-            ]
+            ],
+            'verify_status' => [
+                'type' => 'string',
+                'min' => 5,
+                'max' => 64,
+                'db_type' => 'VARCHAR(64) NOT NULL DEFAULT \'waiting\'',
+                'enum' => ['verified', 'waiting']
+            ],
         ];
     }
 }

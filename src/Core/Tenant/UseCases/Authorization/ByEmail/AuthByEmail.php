@@ -66,8 +66,9 @@ class AuthByEmail implements HandlerInterface {
             ->then(function(array $jwtData) {
                 return $this->jwtManager->encode($jwtData)
                     ->map(fn($token) => [
-                        'token' => $token,
-                        'uid' => $jwtData['uid']
+                        'auth' => [
+                            'token' => $token   
+                        ]
                     ])
                     ->tap(fn() => $this->stopwatch->stop('auth.jwt_gen'))
                     ->tap(fn() => $this->stopwatch->stop('auth.total'))
