@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Tenant\UseCases\Registration\ByEmail;
+namespace App\Core\Tenant\UseCases\Verification;
 
 use App\Core\RepositoriesFactory;
 use App\Core\RepositoriesRouter;
@@ -19,14 +19,14 @@ use Symfony\Component\Stopwatch\Stopwatch;
  * X-Verification-Code [verification code]
  * @version 1.0.0
  */
-class VerifyEmail implements HandlerInterface {
+class VerifyByCode implements HandlerInterface {
 
     const VERIFIED_STATUS = 'verified';
     
     const VERIFY_HEADER = 'X-Verification-Code';
 
     public function __construct(
-        private VerifyEmailValidator $validator,
+        private VerifyByCodeValidator $validator,
         private RepositoriesRouter $repositoriesRouter,
         private Stopwatch $stopwatch,
         private StopwatchManager $stopwatchManager,

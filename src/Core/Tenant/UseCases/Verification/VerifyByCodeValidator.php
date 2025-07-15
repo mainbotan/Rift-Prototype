@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Core\Tenant\UseCases\Registration\ByEmail;
+namespace App\Core\Tenant\UseCases\Verification;
 
 use Rift\Contracts\Validators\ValidatorInterface;
 use Rift\Core\Databus\OperationOutcome;
 use Rift\Validator\SchemaValidator;
 
-class VerifyEmailValidator implements ValidatorInterface {
+class VerifyByCodeValidator implements ValidatorInterface {
     public function __construct(
         private SchemaValidator $schemaValidator
     ) { }

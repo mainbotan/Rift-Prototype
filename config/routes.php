@@ -15,18 +15,19 @@ $routesBox = new RoutesBox();
 
 # Tenant
 $routesBox->group('/v1', function(RoutesBox $box) {
+    $box->limit(100);
     $box->middleware(Rift\Core\Http\RateLimiter\RateLimitMiddleware::class);
 
     $box->group('/reg', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->post('/byEmail', App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmail::class)->limit(100);
+        $box->post('/byEmail', App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmail::class)->limit(10);
     });
     $box->group('/auth', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(6);
+        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(30);
     });
     $box->group('/verify', function(RoutesBox $box) {
-        $box->post('/email', App\Core\Tenant\UseCases\Registration\ByEmail\VerifyEmail::class)->limit(100);
+        $box->post('/email', App\Core\Tenant\UseCases\Verification\VerifyByCode::class)->limit(5);
     });
     $box->group('/account', function(RoutesBox $box) {  
         $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);
