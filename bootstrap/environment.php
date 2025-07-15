@@ -7,6 +7,7 @@
  */
 
 declare(strict_types=1);
+memory_get_peak_usage(true);
 
 // Загрузка .env в первую очередь
 use Dotenv\Dotenv;

@@ -70,8 +70,8 @@ class VerifyEmail implements HandlerInterface {
 
                     ->tap(fn() => $this->stopwatch->start('verify.match_codes'))
                     ->then(function($decodedCode) use ($requestBody, $jwtData) {
-                        if ((string) $decodedCode === (string) $requestBody['code']) {
-                            return Operation::error('Mismatch of verification codes.', Operation::HTTP_UNAUTHORIZED);
+                        if ((string) $decodedCode !== (string) $requestBody['code']) {
+                            return Operation::error(Operation::HTTP_UNAUTHORIZED, 'Mismatch of verification codes.');
                         }
                         return Operation::success($jwtData['uid']);
                     })
@@ -86,12 +86,15 @@ class VerifyEmail implements HandlerInterface {
                     ->then(function(TenantRepository $repository) use ($uid) {
                         return $repository->updateVerifyStatus($uid, self::VERIFIED_STATUS);
                     })
-                    ->tap(fn() => $this->stopwatch->stop('verify.switch_verify_status'));
+                    ->tap(fn() => $this->stopwatch->stop('verify.switch_verify_status'))
+
+                    ->tap(fn() => $this->stopwatch->stop('verify.total'))
+                    ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'verify.total'));
             })
 
             ->catch(function($error, $code) {
                 return Operation::error($code, "Verify failed: $error")
-                    ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'reg.total'));
+                    ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'verify.total'));
             });                         
     }
 }
