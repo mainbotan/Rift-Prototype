@@ -41,10 +41,12 @@ $routesBox->group('/v1', function(RoutesBox $box) {
         $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);    
         $box->middleware(App\Core\Tenant\UseCases\Verification\CheckVerified::class);
 
+        # Clients CRUD
+        $box->post('/clients', App\Tenant\Clients\UseCases\Crud\CreateClient::class)->middleware(App\Core\Middlewares\ParseJsonBody::class);
+        $box->get('/clients', App\Tenant\Clients\UseCases\Crud\GetClients::class);
         $box->group('/clients', function(RoutesBox $box) {
-            $box->post('create-client', App\Tenant\Clients\UseCases\Crud\CreateClient::class)
-                ->middleware(App\Core\Middlewares\ParseJsonBody::class);
         });
+
     });
 });
 

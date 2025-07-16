@@ -9,11 +9,11 @@ use Rift\Core\Repositories\Repository;
 
 class ClientRepository extends Repository
 {
-    public function getClients(int $limit, int $offset): OperationOutcome 
+    public function getClients(array $data): OperationOutcome 
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM clients ORDER BY created_at DESC LIMIT :limit, :offset");
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt = $this->pdo->prepare("SELECT * FROM clients ORDER BY created_at DESC LIMIT :limit OFFSET :offset");
+        $stmt->bindValue(':limit', $data['limit'], PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $data['offset'], PDO::PARAM_INT);
         return $this->executeQuery($stmt);
     }
     public function createClient(array $data): OperationOutcome 

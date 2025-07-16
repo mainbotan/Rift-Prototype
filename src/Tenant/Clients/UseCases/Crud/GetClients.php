@@ -2,7 +2,6 @@
 
 namespace App\Tenant\Clients\UseCases\Crud;
 
-use App\Tenant\Clients\ClientModel;
 use App\Tenant\Clients\ClientRepository;
 use App\Tenant\RepositoriesFactory;
 use App\Tenant\RepositoriesRouter;
@@ -14,9 +13,9 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Rift\Metrics\Stopwatch\StopwatchManager;
 use Rift\Crypto\UidManager;
 
-class CreateClient implements HandlerInterface {
+class GetClients implements HandlerInterface {
     public function __construct(
-        private ClientModel $model,
+        private GetClientsValidator $validator,
         private RepositoriesRouter $repositoriesRouter,
         private Stopwatch $stopwatch,
         private StopwatchManager $stopwatchManager,
@@ -24,31 +23,30 @@ class CreateClient implements HandlerInterface {
     ) { }
 
     public function execute(ServerRequestInterface $request): OperationOutcome {
-        $this->stopwatch->start('client.create.total');
+        $this->stopwatch->start('clients.get.total');
 
-        $requestBody = $request->getParsedBody();
+        $queryParams = $request->getQueryParams();
 
-        $this->stopwatch->start('client.create.validation');
-        return $this->model->validate($requestBody)
+        $this->stopwatch->start('clients.get.validation');
+        return $this->validator->validate($queryParams)
             ->then(function($validatedData) use ($request) { 
-                $this->stopwatch->stop('client.create.validation');
+                $this->stopwatch->stop('clients.get.validation');
                 
-                $this->stopwatch->start('client.create.repo_unit');
+                $this->stopwatch->start('clients.get.repo_unit');
                 return $this->repositoriesRouter->factory($request->getAttribute('uid'))
                     ->then(fn(RepositoriesFactory $factory) => $factory->clients())
-                    ->tap(fn() => $this->stopwatch->stop('client.create.repo_unit'))
+                    ->tap(fn() => $this->stopwatch->stop('clients.get.repo_unit'))
                     
-                    ->tap(fn() => $this->stopwatch->start('client.create.repo_request'))
+                    ->tap(fn() => $this->stopwatch->start('clients.get.repo_request'))
                     ->then(function (ClientRepository $repository) use ($validatedData) {
-                        $validatedData['uid'] = $this->uidManager->generate();
-                        return $repository->createClient($validatedData);
+                        return $repository->getClients($validatedData);
                     })
-                    ->tap(fn() => $this->stopwatch->stop('client.create.repo_request'));
+                    ->tap(fn() => $this->stopwatch->stop('clients.get.repo_request'));
             })
+            ->tap(fn() => $this->stopwatch->stop('clients.get.total'))
+            ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'clients.get.total'))
             ->catch(function($error, $code) {
-                return Operation::error($code, "Create operation failed: $error");
-            })
-            ->tap(fn() => $this->stopwatch->stop('client.create.total'))
-            ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'client.create.total'));
+                return Operation::error($code, "Get operation failed: $error");
+            });
     }
 }

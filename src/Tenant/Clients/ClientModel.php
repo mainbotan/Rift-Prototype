@@ -15,7 +15,8 @@ class ClientModel extends Model {
                 'type' => 'string',
                 'min' => 4,
                 'max' => 64,
-                'db_type' => 'VARCHAR(64) NOT NULL UNIQUE'
+                'db_type' => 'VARCHAR(64) NOT NULL UNIQUE',
+                'default' => null
             ],
             'email' => [
                 'type' => 'string',
@@ -24,7 +25,9 @@ class ClientModel extends Model {
                 'db_type' => 'VARCHAR(64) NULL UNIQUE',
                 'validate' => function($value) {
                     return filter_var($value, FILTER_VALIDATE_EMAIL);
-                }
+                },
+                'default' => null,
+                'optional' => true
             ],
             'phone' => [
                 'type' => 'string',
@@ -33,7 +36,9 @@ class ClientModel extends Model {
                 'db_type' => 'VARCHAR(20) NULL UNIQUE',
                 'validate' => function($value) {
                     return preg_match('/^\+?[\d\s\-\(\)]{10,20}$/', $value);
-                }
+                },
+                'default' => null,
+                'optional' => true
             ],
             'full_name' => [
                 'type' => 'string',
@@ -44,12 +49,14 @@ class ClientModel extends Model {
             'created_at' => [
                 'type' => 'datetime',
                 'db_type' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
-                'readonly' => true
+                'readonly' => true,
+                'optional' => true
             ],
             'updated_at' => [
                 'type' => 'datetime',
                 'db_type' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
-                'readonly' => true
+                'readonly' => true,
+                'optional' => true
             ]
         ];
     }
