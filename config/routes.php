@@ -45,6 +45,8 @@ $routesBox->group('/v1', function(RoutesBox $box) {
         $box->post('/clients', App\Tenant\Clients\UseCases\Crud\CreateClient::class)->middleware(App\Core\Middlewares\ParseJsonBody::class);
         $box->get('/clients', App\Tenant\Clients\UseCases\Crud\GetClients::class);
         $box->patch('/clients/{uid}', App\Tenant\Clients\UseCases\Crud\UpdateClient::class)->middleware(App\Core\Middlewares\ParseJsonBody::class);
+        $box->delete('/clients/{uid}', App\Tenant\Clients\UseCases\Crud\DeleteClient::class);
+        $box->get('/clients/{uid}', App\Tenant\Clients\UseCases\Crud\DeleteClient::class);
         $box->group('/clients', function(RoutesBox $box) {
         });
 

@@ -56,7 +56,7 @@ class UpdateClient implements HandlerInterface {
                                     return Operation::error(Operation::HTTP_NOT_FOUND, "Client not found.");
                                 }
                                 $this->stopwatch->start('client.update.repo_update_client');
-                                return $repository->dynamicUpdateClient($validatedData)
+                                return $repository->updateClient($validatedData)
                                     ->tap(fn() => $this->stopwatch->stop('client.update.repo_update_client'))
 
                                     ->tap(fn() => $this->stopwatch->start('client.update.repo_get_updated_client'))

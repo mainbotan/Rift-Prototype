@@ -24,12 +24,6 @@ class ClientRepository extends Repository
         $this->bindClientData($stmt, $data);
         return $this->executeQuery($stmt);
     }
-    public function updateClient(array $data): OperationOutcome 
-    {
-        $stmt = $this->pdo->prepare("UPDATE clients SET full_name=:full_name, email=:email, phone=:phone WHERE uid=:uid");
-        $this->bindClientData($stmt, $data);
-        return $this->executeQuery($stmt);
-    }
     public function getClientByUid(string $uid): OperationOutcome 
     {
         $stmt = $this->pdo->prepare("SELECT * FROM clients WHERE uid=:uid");
@@ -54,16 +48,20 @@ class ClientRepository extends Repository
                 return Operation::success(true);
             });
     }
-    public function dynamicUpdateClient(array $data) {
+    public function deleteClientByUid(string $uid): OperationOutcome 
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM clients WHERE uid=:uid");
+        $stmt->bindValue(':uid', $uid, PDO::PARAM_STR);
+        return $this->executeQuery($stmt);
+    }
+    public function updateClient(array $data) {
         $uid = $data['uid'];
         unset($data['uid']);
         return $this->buildUpdateQuery($data, ['uid' => $uid])
             ->then(fn($stmt) => $this->executeQuery($stmt));
     } 
 
-    /**
-     * Binding
-     */
+    // binding
     private function bindClientData(PDOStatement $stmt, array $data): void 
     {
         $stmt->bindValue(':uid', $data['uid'] ?? '', PDO::PARAM_STR);
