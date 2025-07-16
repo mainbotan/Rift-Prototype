@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tenant\Clients\UseCases\Crud;
+namespace App\Tenant\Clients\UseCases\Crud\Delete;
 
 use App\Tenant\Clients\ClientModel;
 use App\Tenant\Clients\ClientRepository;

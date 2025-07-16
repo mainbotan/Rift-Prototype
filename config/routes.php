@@ -42,12 +42,12 @@ $routesBox->group('/v1', function(RoutesBox $box) {
         $box->middleware(App\Core\Tenant\UseCases\Verification\CheckVerified::class);
 
         # Clients CRUD
-        $box->post('/clients', App\Tenant\Clients\UseCases\Crud\CreateClient::class)->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->get('/clients', App\Tenant\Clients\UseCases\Crud\GetClients::class);
-        $box->patch('/clients/{uid}', App\Tenant\Clients\UseCases\Crud\UpdateClient::class)->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->delete('/clients/{uid}', App\Tenant\Clients\UseCases\Crud\DeleteClient::class);
-        $box->get('/clients/{uid}', App\Tenant\Clients\UseCases\Crud\GetClient::class);
+        $box->post('/clients', App\Tenant\Clients\UseCases\Crud\Create\CreateClient::class)->middleware(App\Core\Middlewares\ParseJsonBody::class);
+        $box->get('/clients', App\Tenant\Clients\UseCases\Crud\Get\GetClients::class);
         $box->group('/clients', function(RoutesBox $box) {
+            $box->patch('/{uid}', App\Tenant\Clients\UseCases\Crud\Update\UpdateClient::class)->middleware(App\Core\Middlewares\ParseJsonBody::class);
+            $box->delete('/{uid}', App\Tenant\Clients\UseCases\Crud\Delete\DeleteClient::class);
+            $box->get('/{uid}', App\Tenant\Clients\UseCases\Crud\Get\GetClient::class);
         });
 
     });

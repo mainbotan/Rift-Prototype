@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tenant\Clients\UseCases\Crud;
+namespace App\Tenant\Clients\UseCases\Crud\Get;
 
 use Rift\Contracts\Validators\ValidatorInterface;
 use Rift\Core\Databus\OperationOutcome;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tenant\Clients\UseCases\Crud;
+namespace App\Tenant\Clients\UseCases\Crud\Get;
 
 use App\Tenant\Clients\ClientRepository;
 use App\Tenant\RepositoriesFactory;
