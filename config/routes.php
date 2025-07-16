@@ -26,11 +26,12 @@ $routesBox->group('/v1', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
         $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(30);
     });
-    $box->group('/verify', function(RoutesBox $box) {
-        $box->post('/email', App\Core\Tenant\UseCases\Verification\VerifyByCode::class)->limit(5);
-    });
     $box->group('/account', function(RoutesBox $box) {  
-        $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);
+        $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);    
+        $box->post('/verify/email', App\Core\Tenant\UseCases\Verification\VerifyByCode::class)->limit(15);
+
+        $box->middleware(App\Core\Tenant\UseCases\Verification\CheckVerified::class);
+        $box->post('/deploy', App\Core\Tenant\UseCases\Deployment\DeployTenantSchema::class)->limit(5);
         $box->post('/editPassword', App\Core\Tenant\UseCases\Account\EditPassword::class);
     });
 });

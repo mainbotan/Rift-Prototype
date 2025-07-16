@@ -5,6 +5,7 @@ namespace App\Core\Tenant\UseCases\Verification;
 use App\Core\RepositoriesFactory;
 use App\Core\RepositoriesRouter;
 use App\Core\Tenant\TenantRepository;
+use App\Core\Tenant\UseCases\Deployment\DeployTenantSchema;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
 use Rift\Core\Databus\Operation;
@@ -31,7 +32,8 @@ class VerifyByCode implements HandlerInterface {
         private Stopwatch $stopwatch,
         private StopwatchManager $stopwatchManager,
         private JwtManager $jwtManager,
-        private EncryptionManager $encryptionManager
+        private EncryptionManager $encryptionManager,
+        private DeployTenantSchema $deployTenant
     )
     { }
     public function execute(ServerRequestInterface $request): OperationOutcome
