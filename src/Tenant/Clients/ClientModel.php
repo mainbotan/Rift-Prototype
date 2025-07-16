@@ -51,7 +51,6 @@ class ClientModel extends Model {
                 'db_type' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
                 'readonly' => true
             ]
-
         ];
     }
 }

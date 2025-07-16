@@ -20,19 +20,31 @@ $routesBox->group('/v1', function(RoutesBox $box) {
 
     $box->group('/reg', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->post('/byEmail', App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmail::class)->limit(10);
+        $box->post('/by-email', App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmail::class)->limit(10);
     });
     $box->group('/auth', function(RoutesBox $box) {
         $box->middleware(App\Core\Middlewares\ParseJsonBody::class);
-        $box->post('/byEmail', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(30);
+        $box->post('/by-email', App\Core\Tenant\UseCases\Authorization\ByEmail\AuthByEmail::class)->limit(30);
     });
     $box->group('/account', function(RoutesBox $box) {  
         $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);    
-        $box->post('/verify/email', App\Core\Tenant\UseCases\Verification\VerifyByCode::class)->limit(15);
+        $box->post('/verify/by-code', App\Core\Tenant\UseCases\Verification\VerifyByCode::class)->limit(15);
 
         $box->middleware(App\Core\Tenant\UseCases\Verification\CheckVerified::class);
         $box->post('/deploy', App\Core\Tenant\UseCases\Deployment\DeployTenantSchema::class)->limit(5);
-        $box->post('/editPassword', App\Core\Tenant\UseCases\Account\EditPassword::class);
+        $box->post('/edit-password', App\Core\Tenant\UseCases\Account\EditPassword::class);
+    });
+
+    # Tenant Space
+    $box->group('/space', function(RoutesBox $box) {  
+        $box->limit(1000);
+        $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);    
+        $box->middleware(App\Core\Tenant\UseCases\Verification\CheckVerified::class);
+
+        $box->group('/clients', function(RoutesBox $box) {
+            $box->post('create-client', App\Tenant\Clients\UseCases\Crud\CreateClient::class)
+                ->middleware(App\Core\Middlewares\ParseJsonBody::class);
+        });
     });
 });
 

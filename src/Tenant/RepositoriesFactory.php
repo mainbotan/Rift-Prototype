@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Core;
+namespace App\Tenant;
 
-use App\Core\Tenant\TenantModel;
-use App\Core\Tenant\TenantRepository;
+use App\Tenant\Clients\ClientModel;
+use App\Tenant\Clients\ClientRepository;
 use PDO;
 use Rift\Contracts\Repositories\RepositoriesFactoryInterface;
 use Rift\Core\Databus\Operation;
@@ -13,9 +13,10 @@ class RepositoriesFactory implements RepositoriesFactoryInterface {
     public function __construct(
         private PDO $pdo
     ) {}
-    public function tenants(): OperationOutcome {
+
+    public function clients(): OperationOutcome {
         return Operation::success(
-            new TenantRepository($this->pdo, new TenantModel)
+            new ClientRepository($this->pdo, new ClientModel)
         );
     }
 }
