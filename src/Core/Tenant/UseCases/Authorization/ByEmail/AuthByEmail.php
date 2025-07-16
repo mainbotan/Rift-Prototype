@@ -16,6 +16,8 @@ use App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmailValidator;
 use Rift\Core\Databus\Operation;
 
 class AuthByEmail implements HandlerInterface {
+    const AUTH_TOKEN_TTL = 3600 * 24;
+
     public function __construct(
         private RegistrateByEmailValidator $validator,
         private RepositoriesRouter $repositoriesRouter,
@@ -64,7 +66,7 @@ class AuthByEmail implements HandlerInterface {
             
             ->tap(fn() => $this->stopwatch->start('auth.jwt_gen'))
             ->then(function(array $jwtData) {
-                return $this->jwtManager->encode($jwtData)
+                return $this->jwtManager->encode($jwtData, self::AUTH_TOKEN_TTL)
                     ->map(fn($token) => [
                         'auth' => [
                             'token' => $token   

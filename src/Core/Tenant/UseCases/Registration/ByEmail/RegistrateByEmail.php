@@ -23,6 +23,10 @@ use Rift\Metrics\Stopwatch\StopwatchManager;
  * @version 1.0.0
  */
 class RegistrateByEmail implements HandlerInterface {
+
+    const AUTH_TOKEN_TTL = 3600 * 24;
+    const VERIFY_TOKEN_TTL = 1800;
+
     public function __construct(
         private RegistrateByEmailValidator $validator,
         private RepositoriesRouter $repositoriesRouter,
@@ -82,7 +86,7 @@ class RegistrateByEmail implements HandlerInterface {
 
             ->tap(fn() => $this->stopwatch->start('reg.jwt_gen'))
             ->then(function(array $jwtData) {
-                return $this->jwtManager->encode($jwtData)
+                return $this->jwtManager->encode($jwtData, self::AUTH_TOKEN_TTL)
                     ->map(fn($token) => [
                         'auth' => [
                             'token' => $token
@@ -113,7 +117,7 @@ class RegistrateByEmail implements HandlerInterface {
                         return $this->jwtManager->encode([
                             'uid' => $result['uid'],
                             'code' => $encryptedVerifyCode
-                        ]);
+                        ], self::VERIFY_TOKEN_TTL);
                     })
                     ->map(fn($verifyToken) => [
                         'auth' => $result['auth'],
