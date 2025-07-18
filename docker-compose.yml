@@ -35,29 +35,24 @@ services:
       environment:
         COMPOSER_HOME: /tmp/composer
 
-  mysql:
-    image: mysql:8.0
+  postgres:
+    image: postgres:15
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      MYSQL_DATABASE: ${DB_NAME:-rift}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-rift}
     volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -uroot -p${DB_PASSWORD:-root}"]
-      interval: 5s
-      timeout: 10s
-      retries: 10
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
+      - postgres_data:/var/lib/postgresql/data
+  
+  pgadmin:
+    image: dpage/pgadmin4
     ports:
-      - 8081:80
+      - 8083:80
     environment:
-      PMA_HOST: mysql
-      PMA_USER: root
-      PMA_PASSWORD: ${DB_PASSWORD:-root}
+      PGADMIN_DEFAULT_EMAIL: ${DB_ADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${DB_PASSWORD:-admin}
     depends_on:
-      - mysql
+      - postgres
     
   mailhog:
     image: mailhog/mailhog
@@ -83,3 +78,4 @@ services:
 volumes:
   mysql_data:
   redis_data:
+  postgres_data:

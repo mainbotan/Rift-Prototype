@@ -8,6 +8,8 @@ class ClientModel extends Model {
     
     public static function getTableName(): string { return 'clients'; }
 
+    public static function getVersion(): string { return '1.0.2'; }
+
     public static function getSchema(): array
     {
         return [
@@ -46,15 +48,37 @@ class ClientModel extends Model {
                 'max' => 100,
                 'db_type' => 'VARCHAR(100) NULL'
             ],
+            'notes' => [
+                'type' => 'string',
+                'min' => 2,
+                'max' => 1024,
+                'db_type' => 'VARCHAR(1024) NULL',
+                'default' => null,
+                'optional' => true
+            ],
+            'source' => [
+                'type' => 'string',
+                'min' => 2,
+                'max' => 32,
+                'db_type' => 'VARCHAR(32) NULL',
+                'default' => null,
+                'optional' => true
+            ],
+            'profit' => [
+                'type' => 'float',
+                'db_type' => 'DECIMAL(15,2) NULL',
+                'default' => null,
+                'optional' => true
+            ],
             'created_at' => [
                 'type' => 'datetime',
                 'db_type' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
                 'readonly' => true,
                 'optional' => true
-            ],
+            ],            
             'updated_at' => [
                 'type' => 'datetime',
-                'db_type' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+                'db_type' => 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP',
                 'readonly' => true,
                 'optional' => true
             ]

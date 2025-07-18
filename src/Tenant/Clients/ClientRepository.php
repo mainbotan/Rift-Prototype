@@ -20,9 +20,8 @@ class ClientRepository extends Repository
     }
     public function createClient(array $data): OperationOutcome 
     {
-        $stmt = $this->pdo->prepare("INSERT INTO clients (uid, full_name, email, phone) VALUES (:uid, :full_name, :email, :phone)");
-        $this->bindClientData($stmt, $data);
-        return $this->executeQuery($stmt);
+        return $this->buildInsertQuery($data)
+            ->then(fn($stmt) => $this->executeQuery($stmt));
     }
     public function getClientByUid(string $uid): OperationOutcome 
     {
@@ -59,14 +58,5 @@ class ClientRepository extends Repository
         unset($data['uid']);
         return $this->buildUpdateQuery($data, ['uid' => $uid])
             ->then(fn($stmt) => $this->executeQuery($stmt));
-    } 
-
-    // binding
-    private function bindClientData(PDOStatement $stmt, array $data): void 
-    {
-        $stmt->bindValue(':uid', $data['uid'] ?? '', PDO::PARAM_STR);
-        $stmt->bindValue(':full_name', $data['full_name'] ?? '', PDO::PARAM_STR);
-        $stmt->bindValue(':email', $data['email'] ?? '', PDO::PARAM_STR);
-        $stmt->bindValue(':phone', $data['phone'] ?? '', PDO::PARAM_STR);
     }
 }

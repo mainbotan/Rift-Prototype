@@ -28,12 +28,15 @@ $routesBox->group('/v1', function(RoutesBox $box) {
     });
     $box->group('/account', function(RoutesBox $box) {  
         $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);    
-        $box->post('/verify/by-code', App\Core\Tenant\UseCases\Verification\VerifyByCode::class)->limit(15);
-
+        $box->post('/verify/by-code', App\Core\Tenant\UseCases\Verification\VerifyByCode::class)->limit(35);
+    });
+    $box->group('/account', function(RoutesBox $box) {  
+        $box->middleware(App\Core\Tenant\UseCases\Authorization\CheckJwtWithUid::class);    
         $box->middleware(App\Core\Tenant\UseCases\Verification\CheckVerified::class);
-        $box->post('/deploy', App\Core\Tenant\UseCases\Deployment\DeployTenantSchema::class)->limit(5);
+        $box->post('/deploy', App\Core\Tenant\UseCases\Deployment\DeployTenantSchema::class)->limit(50);
         $box->post('/edit-password', App\Core\Tenant\UseCases\Account\EditPassword::class);
     });
+
 
     # Tenant Space
     $box->group('/space', function(RoutesBox $box) {  

@@ -7,6 +7,7 @@ use Rift\Core\Models\Model;
 class TenantModel extends Model {
     
     public static function getTableName(): string { return 'tenants'; }
+    public static function getVersion(): string { return '1.0.0'; }
 
     public static function getSchema(): array
     {
