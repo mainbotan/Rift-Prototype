@@ -8,11 +8,11 @@ use Rift\Core\ORM\Types;
 class TenantModel extends Model {
     
     const NAME = 'tenants';
-    const VERSION = '1.0.8';
+    const VERSION = '1.0.9';
 
     protected function schema(): void {
-        $this->table->create('uid')
-            ->type(Types::UUID)
+        $this->table->update('uid')
+            ->type(Types::varchar(32))
             ->nullable(false)
             ->affirm();
 

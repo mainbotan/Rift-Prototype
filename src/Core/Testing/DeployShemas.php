@@ -18,5 +18,8 @@ class DeployShemas implements HandlerInterface {
     {
         $this->configurator::registerSystemModel(\App\Core\Tenant\TenantModel::class);
         return $this->configurator->forSystem()->configure();
+
+        // $this->configurator::registerTenantModel(\App\Tenant\Clients\ClientModel::class);
+        // return $this->configurator->forTenant(1234, 'tenant_')->configure();
     }
 }

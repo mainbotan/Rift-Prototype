@@ -46,7 +46,6 @@ class UpdateClient implements HandlerInterface {
                     
                     ->tap(fn() => $this->stopwatch->start('client.update.repo_request'))
                     ->then(function (ClientRepository $repository) use ($validatedData) {
-                        
                         $this->stopwatch->start('client.update.repo_check_uid');
                         return $repository->checkClientByUid($validatedData['uid'])
                             ->tap(fn() => $this->stopwatch->stop('client.update.repo_check_uid'))

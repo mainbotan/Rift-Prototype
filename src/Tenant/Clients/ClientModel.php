@@ -8,7 +8,7 @@ use Rift\Core\ORM\Types;
 class ClientModel extends Model {
 
     const NAME = 'clients';
-    const VERSION = '1.0.0';
+    const VERSION = '1.0.6';
 
     public function schema(): void
     {
@@ -22,24 +22,9 @@ class ClientModel extends Model {
             ])
             ->affirm();
         
-        $this->table->create('email')
+        $this->table->update('email')
             ->type(Types::varchar(64))
-            ->nullable(false)
-            ->validation([
-                'type' => 'string',
-                'min' => 4,
-                'max' => 64,
-                'validate' => function($value) {
-                    return filter_var($value, FILTER_VALIDATE_EMAIL);
-                },
-                'default' => null,
-                'optional' => null
-            ])
-            ->affirm();
-        
-        $this->table->create('email')
-            ->type(Types::varchar(64))
-            ->nullable(false)
+            ->nullable(true)
             ->validation([
                 'type' => 'string',
                 'min' => 4,
@@ -65,6 +50,7 @@ class ClientModel extends Model {
                 'default' => null,
                 'optional' => true
             ])
+            ->nullable(true)
             ->affirm();
 
         $this->table->create('full_name')
@@ -74,6 +60,7 @@ class ClientModel extends Model {
                 'min' => 2,
                 'max' => 100
             ])
+            ->nullable(true)
             ->affirm();
 
         $this->table->create('created_at')
