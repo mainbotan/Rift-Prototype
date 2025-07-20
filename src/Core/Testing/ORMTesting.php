@@ -7,16 +7,19 @@ use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Database\Configurators\ConfiguratorInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
 use App\Core\Tenant\BetaTenantModel;
-use App\Core\Tenant\TenantModel;
+use App\Core\Testing\Sources\ClientsModel;
 use Rift\Core\Databus\Operation;
+use Rift\Core\ORM\Table;
+use Rift\Core\ORM\Types;
 
-class DeployShemas implements HandlerInterface {
+class ORMTesting implements HandlerInterface {
     public function __construct(
-        private ConfiguratorInterface $configurator
+        private ClientsModel $model
     ) { }
     public function execute(ServerRequestInterface $request): OperationOutcome 
     {
-        $this->configurator::registerSystemModel(\App\Core\Tenant\TenantModel::class);
-        return $this->configurator->forSystem()->configure();
+        $migration = $this->model->migrate();
+        var_dump($migration);
+        return Operation::success($migration);
     }
 }

@@ -2,46 +2,37 @@
 
 namespace App\Core\Tenant;
 
-use Rift\Core\Models\Model;
+use Rift\Core\ORM\Model;
+use Rift\Core\ORM\Types;
 
 class TenantModel extends Model {
     
-    public static function getTableName(): string { return 'tenants'; }
-    public static function getVersion(): string { return '1.0.0'; }
+    const NAME = 'tenants';
+    const VERSION = '1.0.8';
 
-    public static function getSchema(): array
-    {
-        return [
-            'uid' => [
-                'type' => 'string',
-                'min' => 4,
-                'max' => 64,
-                'db_type' => 'VARCHAR(64) NOT NULL UNIQUE'
-            ],
-            'email' => [
-                'type' => 'string',
-                'min' => 5,
-                'max' => 64,
-                'required' => true,
-                'db_type' => 'VARCHAR(64) NOT NULL UNIQUE',
-                'message' => 'Invalid email format',
-                'validate' => function($value) {
-                    return filter_var($value, FILTER_VALIDATE_EMAIL);
-                }
-            ],
-            'hash' => [
-                'type' => 'string',
-                'min' => 8,
-                'max' => 256,
-                'db_type' => 'VARCHAR(256) NOT NULL'
-            ],
-            'verify_status' => [
-                'type' => 'string',
-                'min' => 5,
-                'max' => 64,
-                'db_type' => 'VARCHAR(64) NOT NULL DEFAULT \'waiting\'',
-                'enum' => ['verified', 'waiting']
-            ],
-        ];
+    protected function schema(): void {
+        $this->table->create('uid')
+            ->type(Types::UUID)
+            ->nullable(false)
+            ->affirm();
+
+        $this->table->create('email')
+            ->type(Types::varchar(64))
+            ->nullable(false)
+            ->affirm();
+
+        $this->table->create('hash')
+            ->type(Types::varchar(255))
+            ->nullable(false)
+            ->affirm();
+        
+        $this->table->create('verify_status')
+            ->type(Types::varchar(64))
+            ->defaultValue('waiting') 
+            ->nullable(false)
+            ->affirm();
+
+        $this->table->uniqueIndex(['uid', 'email'])
+            ->affirm();
     }
 }

@@ -1207,7 +1207,7 @@
             "dist": {
                 "type": "path",
                 "url": "../core",
-                "reference": "52fa09e6e951750239b68d720730e03932ed0c9c"
+                "reference": "66d0b45b72d9aa5d90aa6c3b57cb62b2fc1d26cc"
             },
             "require": {
                 "ext-openssl": "*",
