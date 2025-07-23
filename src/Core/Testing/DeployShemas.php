@@ -2,24 +2,25 @@
 
 namespace App\Core\Testing;
 
+use App\Core\Tenant\TenantModel;
 use Rift\Core\Databus\OperationOutcome;
 use Psr\Http\Message\ServerRequestInterface;
-use Rift\Contracts\Database\Configurators\ConfiguratorInterface;
+use Rift\Contracts\Database\Migrations\DispatcherInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use App\Core\Tenant\BetaTenantModel;
-use App\Core\Tenant\TenantModel;
-use Rift\Core\Databus\Operation;
 
 class DeployShemas implements HandlerInterface {
     public function __construct(
-        private ConfiguratorInterface $configurator
+        private DispatcherInterface $dispatcher
     ) { }
     public function execute(ServerRequestInterface $request): OperationOutcome 
     {
-        $this->configurator::registerSystemModel(\App\Core\Tenant\TenantModel::class);
-        return $this->configurator->forSystem()->configure();
+        $result = $this->dispatcher
+            ->model(TenantModel::class)
+            ->forSystem()
+            ->configure();
 
-        // $this->configurator::registerTenantModel(\App\Tenant\Clients\ClientModel::class);
-        // return $this->configurator->forTenant(1234, 'tenant_')->configure();
+        var_dump($this->dispatcher->logs);
+        return $result;
+        
     }
 }

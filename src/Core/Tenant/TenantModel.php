@@ -2,13 +2,13 @@
 
 namespace App\Core\Tenant;
 
-use Rift\Core\ORM\Model;
-use Rift\Core\ORM\Types;
+use Rift\Core\Database\Models\Model;
+use Rift\Core\Database\Models\Types;
 
 class TenantModel extends Model {
     
     const NAME = 'tenants';
-    const VERSION = '1.0.9';
+    const VERSION = '1.1.7';
 
     protected function schema(): void {
         $this->table->update('uid')
@@ -27,6 +27,12 @@ class TenantModel extends Model {
             ->affirm();
         
         $this->table->create('verify_status')
+            ->type(Types::varchar(64))
+            ->defaultValue('waiting') 
+            ->nullable(false)
+            ->affirm();
+        
+        $this->table->create('penis')
             ->type(Types::varchar(64))
             ->defaultValue('waiting') 
             ->nullable(false)

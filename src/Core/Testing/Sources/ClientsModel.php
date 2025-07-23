@@ -2,9 +2,9 @@
 
 namespace App\Core\Testing\Sources;
 
-use Rift\Core\ORM\Model;
+use Rift\Core\Database\Models\Model;
 use Rift\Core\ORM\Table;
-use Rift\Core\ORM\Types;
+use Rift\Core\Database\Models\Types;
 
 class ClientsModel extends Model {
     const NAME = 'users';

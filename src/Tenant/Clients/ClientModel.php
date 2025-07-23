@@ -2,13 +2,13 @@
 
 namespace App\Tenant\Clients;
 
-use Rift\Core\ORM\Model;
-use Rift\Core\ORM\Types;
+use Rift\Core\Database\Models\Model;
+use Rift\Core\Database\Models\Types;
 
 class ClientModel extends Model {
 
     const NAME = 'clients';
-    const VERSION = '1.0.6';
+    const VERSION = '1.0.8';
 
     public function schema(): void
     {

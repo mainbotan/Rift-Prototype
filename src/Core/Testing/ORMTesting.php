@@ -10,7 +10,7 @@ use App\Core\Tenant\BetaTenantModel;
 use App\Core\Testing\Sources\ClientsModel;
 use Rift\Core\Databus\Operation;
 use Rift\Core\ORM\Table;
-use Rift\Core\ORM\Types;
+use Rift\Core\Database\Models\Types;
 
 class ORMTesting implements HandlerInterface {
     public function __construct(
