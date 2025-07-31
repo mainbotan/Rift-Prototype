@@ -8,8 +8,8 @@ use App\Core\Tenant\TenantRepository;
 use App\Core\Tenant\UseCases\Deployment\DeployTenantSchema;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 use Rift\Crypto\EncryptionManager;
 use Rift\Crypto\JwtManager;
 use Rift\Metrics\Stopwatch\StopwatchManager;
@@ -36,7 +36,7 @@ class VerifyByCode implements HandlerInterface {
         private DeployTenantSchema $deployTenant
     )
     { }
-    public function execute(ServerRequestInterface $request): OperationOutcome
+    public function execute(ServerRequestInterface $request): ResultType
     {
         // stopwatch
         $this->stopwatch->start('verify.total');
@@ -44,7 +44,7 @@ class VerifyByCode implements HandlerInterface {
         // checking GET token
         $queryParams = $request->getQueryParams();
         if (!isset($queryParams['token'])) {
-            return Operation::error(Operation::HTTP_BAD_REQUEST, 'Verify token lost.');
+            return Result::Failure(Result::HTTP_BAD_REQUEST, 'Verify token lost.');
         }
         $verifyToken = $queryParams['token'];
         
@@ -63,7 +63,7 @@ class VerifyByCode implements HandlerInterface {
             ->tap(fn() => $this->stopwatch->start('verify.token_check_exp'))
             ->ensure(function($jwtData) {   
                 return $this->jwtManager->checkExpiration($jwtData);
-            }, 'Verification token expired.', Operation::HTTP_UNAUTHORIZED)
+            }, 'Verification token expired.', Result::HTTP_UNAUTHORIZED)
             ->tap(fn() => $this->stopwatch->stop('verify.token_check_exp'))
             
             ->then(function ($jwtData) use ($clientCode) {
@@ -77,9 +77,9 @@ class VerifyByCode implements HandlerInterface {
                     ->tap(fn() => $this->stopwatch->start('verify.match_codes'))
                     ->then(function($decodedCode) use ($clientCode, $jwtData) {
                         if ((string) $decodedCode !== (string) $clientCode) {
-                            return Operation::error(Operation::HTTP_UNAUTHORIZED, 'Mismatch of verification codes.');
+                            return Result::Failure(Result::HTTP_UNAUTHORIZED, 'Mismatch of verification codes.');
                         }
-                        return Operation::success($jwtData['uid']);
+                        return Result::Success($jwtData['uid']);
                     })
                     ->tap(fn() => $this->stopwatch->stop('verify.match_codes'))
                     
@@ -99,7 +99,7 @@ class VerifyByCode implements HandlerInterface {
             })
 
             ->catch(function($error, $code) {
-                return Operation::error($code, "Verify failed: $error")
+                return Result::Failure($code, "Verify failed: $error")
                     ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'verify.total'));
             });                         
     }

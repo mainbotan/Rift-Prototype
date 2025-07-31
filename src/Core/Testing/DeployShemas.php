@@ -3,7 +3,7 @@
 namespace App\Core\Testing;
 
 use App\Core\Tenant\TenantModel;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\ResultType;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Database\Migrations\DispatcherInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
@@ -12,7 +12,7 @@ class DeployShemas implements HandlerInterface {
     public function __construct(
         private DispatcherInterface $dispatcher
     ) { }
-    public function execute(ServerRequestInterface $request): OperationOutcome 
+    public function execute(ServerRequestInterface $request): ResultType 
     {
         $result = $this->dispatcher
             ->model(TenantModel::class)

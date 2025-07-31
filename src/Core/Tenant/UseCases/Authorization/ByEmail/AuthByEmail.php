@@ -5,7 +5,7 @@ namespace App\Core\Tenant\UseCases\Authorization\ByEmail;
 use App\Core\RepositoriesRouter;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\ResultType;
 use Rift\Crypto\JwtManager;
 use Rift\Metrics\Stopwatch\StopwatchManager;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -13,7 +13,7 @@ use App\Core\RepositoriesFactory;
 use App\Core\Tenant\TenantRepository;
 use App\Core\Tenant\UseCases\Registration\ByEmail\GenerateVerifyJwtTokenValidator;
 use App\Core\Tenant\UseCases\Registration\ByEmail\RegistrateByEmailValidator;
-use Rift\Core\Databus\Operation;
+use Rift\Core\Databus\Result;
 
 class AuthByEmail implements HandlerInterface {
     const AUTH_TOKEN_TTL = 3600 * 24;
@@ -25,7 +25,7 @@ class AuthByEmail implements HandlerInterface {
         private Stopwatch $stopwatch,
         private StopwatchManager $stopwatchManager
     ) { }
-    public function execute(ServerRequestInterface $request): OperationOutcome
+    public function execute(ServerRequestInterface $request): ResultType
     {
         // stopwatch
         $this->stopwatch->start('auth.total');
@@ -48,17 +48,17 @@ class AuthByEmail implements HandlerInterface {
                     $this->stopwatch->stop('auth.hash_request');
 
                     if (!isset($tenantData[0]['uid'])) {
-                        return Operation::error(Operation::HTTP_NOT_FOUND, 'Account not found.');
+                        return Result::Failure(Result::HTTP_NOT_FOUND, 'Account not found.');
                     } 
                     $hash = $tenantData[0]['hash'];
 
                     $this->stopwatch->start('auth.hash_verify');
                     if (!password_verify($requestBody['password'], $hash)) {
-                        return Operation::error(Operation::HTTP_FORBIDDEN, 'Invalid password.');
+                        return Result::Failure(Result::HTTP_FORBIDDEN, 'Invalid password.');
                     }
                     $this->stopwatch->stop('auth.hash_verify');
 
-                    return Operation::success([
+                    return Result::Success([
                         'uid' => $tenantData[0]['uid']
                     ]);
                 }
@@ -77,7 +77,7 @@ class AuthByEmail implements HandlerInterface {
                     ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'auth.total'));
             })
             ->catch(function($error, $code) {
-                return Operation::error($code, "Authorization failed: $error")
+                return Result::Failure($code, "Authorization failed: $error")
                     ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'auth.total'));
             });
     }

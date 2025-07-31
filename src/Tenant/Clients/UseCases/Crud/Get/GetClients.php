@@ -7,8 +7,8 @@ use App\Tenant\RepositoriesFactory;
 use App\Tenant\RepositoriesRouter;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Rift\Metrics\Stopwatch\StopwatchManager;
 use Rift\Crypto\UidManager;
@@ -22,7 +22,7 @@ class GetClients implements HandlerInterface {
         private UidManager $uidManager
     ) { }
 
-    public function execute(ServerRequestInterface $request): OperationOutcome {
+    public function execute(ServerRequestInterface $request): ResultType {
         $this->stopwatch->start('clients.get.total');
 
         $queryParams = $request->getQueryParams();
@@ -46,7 +46,7 @@ class GetClients implements HandlerInterface {
             ->tap(fn() => $this->stopwatch->stop('clients.get.total'))
             ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'clients.get.total'))
             ->catch(function($error, $code) {
-                return Operation::error($code, "Get operation failed: $error");
+                return Result::Failure($code, "Get operation failed: $error");
             });
     }
 }

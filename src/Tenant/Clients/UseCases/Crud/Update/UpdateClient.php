@@ -8,8 +8,8 @@ use App\Tenant\RepositoriesFactory;
 use App\Tenant\RepositoriesRouter;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Rift\Metrics\Stopwatch\StopwatchManager;
 use Rift\Crypto\UidManager;
@@ -23,13 +23,13 @@ class UpdateClient implements HandlerInterface {
         private UidManager $uidManager
     ) { }
 
-    public function execute(ServerRequestInterface $request): OperationOutcome {
+    public function execute(ServerRequestInterface $request): ResultType {
         $this->stopwatch->start('client.update.total');
 
         $requestBody = $request->getParsedBody();
         $paramsFromRoute = $request->getAttribute('params');
         if (!isset($paramsFromRoute['uid'])) {
-            return Operation::error(Operation::HTTP_BAD_REQUEST, 'The required uid route parameter is lost.');
+            return Result::Failure(Result::HTTP_BAD_REQUEST, 'The required uid route parameter is lost.');
         }
         $uid = $paramsFromRoute['uid'];
         $requestBody['uid'] = $uid;
@@ -52,7 +52,7 @@ class UpdateClient implements HandlerInterface {
 
                             ->then(function ($result) use ($repository, $validatedData) {
                                 if ($result !== true) {
-                                    return Operation::error(Operation::HTTP_NOT_FOUND, "Client not found.");
+                                    return Result::Failure(Result::HTTP_NOT_FOUND, "Client not found.");
                                 }
                                 $this->stopwatch->start('client.update.repo_update_client');
                                 return $repository->updateClient($validatedData)
@@ -68,7 +68,7 @@ class UpdateClient implements HandlerInterface {
                     ->tap(fn() => $this->stopwatch->stop('client.update.repo_request'));
             })
             ->catch(function($error, $code) {
-                return Operation::error($code, "Update operation failed: $error");
+                return Result::Failure($code, "Update operation failed: $error");
             })
             ->tap(fn() => $this->stopwatch->stop('client.update.total'))
             ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'client.update.total'));

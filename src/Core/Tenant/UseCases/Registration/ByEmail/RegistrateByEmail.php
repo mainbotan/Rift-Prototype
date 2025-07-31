@@ -9,8 +9,8 @@ use App\Core\Tenant\TenantRepository;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
 use Rift\Crypto\JwtManager;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 use Rift\Crypto\EncryptionManager;
 use Rift\Crypto\HashManager;
 use Rift\Crypto\UidManager;
@@ -39,7 +39,7 @@ class RegistrateByEmail implements HandlerInterface {
         private EncryptionManager $encryptionManager
     ) { }
 
-    public function execute(ServerRequestInterface $request): OperationOutcome {
+    public function execute(ServerRequestInterface $request): ResultType {
 
         // stopwatch
         $this->stopwatch->start('reg.total');
@@ -64,7 +64,7 @@ class RegistrateByEmail implements HandlerInterface {
                     return !isset($existing[0]['uid']);
                 },
                 'A client with the same email already exists. If it was you, log in to access your account.',
-                Operation::HTTP_CONFLICT
+                Result::HTTP_CONFLICT
             )
             ->then(function(TenantRepository $repository) use ($requestBody) {
 
@@ -109,7 +109,7 @@ class RegistrateByEmail implements HandlerInterface {
                     ->tap(fn() => $this->stopwatch->start('reg.verify_code_send'))
                     ->then(function($encryptedVerifyCode) use ($requestBody, $verifyCode) {
                         $this->mailer->sendConfirmationEmail($requestBody['email'], $verifyCode);
-                        return Operation::success($encryptedVerifyCode);
+                        return Result::Success($encryptedVerifyCode);
                     })
                     ->tap(fn() => $this->stopwatch->stop('reg.verify_code_send'))
 
@@ -129,7 +129,7 @@ class RegistrateByEmail implements HandlerInterface {
                     ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'reg.total'));
             })
             ->catch(function($error, $code) {
-                return Operation::error($code, "Registration failed: $error")
+                return Result::Failure($code, "Registration failed: $error")
                     ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'reg.total'));
             });
     }

@@ -8,8 +8,8 @@ use App\Tenant\RepositoriesFactory;
 use App\Tenant\RepositoriesRouter;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Rift\Metrics\Stopwatch\StopwatchManager;
 use Rift\Crypto\UidManager;
@@ -23,7 +23,7 @@ class CreateClient implements HandlerInterface {
         private UidManager $uidManager
     ) { }
 
-    public function execute(ServerRequestInterface $request): OperationOutcome {
+    public function execute(ServerRequestInterface $request): ResultType {
         $this->stopwatch->start('client.create.total');
 
         $requestBody = $request->getParsedBody();
@@ -46,7 +46,7 @@ class CreateClient implements HandlerInterface {
                     ->tap(fn() => $this->stopwatch->stop('client.create.repo_request'));
             })
             ->catch(function($error, $code) {
-                return Operation::error($code, "Create operation failed: $error");
+                return Result::Failure($code, "Create operation failed: $error");
             })
             ->tap(fn() => $this->stopwatch->stop('client.create.total'))
             ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'client.create.total'));

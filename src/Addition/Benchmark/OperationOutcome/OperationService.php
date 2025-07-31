@@ -1,33 +1,33 @@
 <?php
 
-namespace App\Addition\Benchmark\OperationOutcome;
+namespace App\Addition\Benchmark\ResultType;
 
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 
 class OperationService
 {
-    public function processSuccess(): OperationOutcome
+    public function processSuccess(): ResultType
     {
-        return Operation::success('OK');
+        return Result::Success('OK');
     }
     
-    public function processError(): OperationOutcome 
+    public function processError(): ResultType 
     {
-        return Operation::error(400, 'Error');
+        return Result::Failure(400, 'Error');
     }
     
-    public function processChain(int $depth): OperationOutcome
+    public function processChain(int $depth): ResultType
     {
-        return Operation::success(0)
+        return Result::Success(0)
             ->then(fn($x) => $this->step($x, $depth));
     }
     
-    private function step(int $x, int $depth): OperationOutcome
+    private function step(int $x, int $depth): ResultType
     {
         return $x >= $depth 
-            ? Operation::error(400, 'Max depth reached')
-            : Operation::success($x + 1)
+            ? Result::Failure(400, 'Max depth reached')
+            : Result::Success($x + 1)
                 ->then(fn($y) => $this->step($y, $depth));
     }
 }

@@ -11,7 +11,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // Теплый запуск для инициализации всего
-new App\Benchmark\OperationOutcome\OperationService();
+new App\Benchmark\ResultType\OperationService();
 new App\Benchmark\Exceptions\ExceptionService();
 
 function run_benchmark(string $name, callable $test, int $iterations = 10000): array {
@@ -71,7 +71,7 @@ function format_results(array $results): string {
     return $output;
 }
 
-$opService = new App\Benchmark\OperationOutcome\OperationService();
+$opService = new App\Benchmark\ResultType\OperationService();
 $exService = new App\Benchmark\Exceptions\ExceptionService();
 
 $tests = [

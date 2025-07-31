@@ -5,12 +5,12 @@ namespace App\Core\Middlewares;
 use Exception;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Middlewares\MiddlewareInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 
 class ParseJsonBody implements MiddlewareInterface 
 {
-    public function execute(ServerRequestInterface $request): OperationOutcome
+    public function execute(ServerRequestInterface $request): ResultType
     {
         $jsonBody = $request->getBody()->getContents();
 
@@ -24,10 +24,10 @@ class ParseJsonBody implements MiddlewareInterface
             // Создаем новый запрос с распарсенным телом
             $newRequest = $request->withParsedBody($parsedBody);
             
-            return Operation::success($newRequest);
+            return Result::Success($newRequest);
             
         } catch (Exception $e) {
-            return Operation::error(Operation::HTTP_BAD_REQUEST, $e->getMessage());
+            return Result::Failure(Result::HTTP_BAD_REQUEST, $e->getMessage());
         }
     }
 }

@@ -3,24 +3,24 @@
 // https://habr.com/ru/sandbox/248424/
 namespace App\Addition\Examples;
 
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 
 class SomeService 
 {
     /**
      * Базовый пример успешной операции
      */
-    public static function simpleSuccess(): OperationOutcome
+    public static function simpleSuccess(): ResultType
     {
         $result = ['data' => 'Successful operation'];
-        return Operation::success($result);
+        return Result::Success($result);
     }
 
     /**
      * Успешная операция с метриками
      */
-    public static function successWithMetrics(): OperationOutcome
+    public static function successWithMetrics(): ResultType
     {
         $result = ['user_id' => 123, 'name' => 'Huila'];
         
@@ -30,13 +30,13 @@ class SomeService
             'database_queries' => 3
         ];
         
-        return Operation::success($result, $metrics);
+        return Result::Success($result, $metrics);
     }
 
     /**
      * Успешная операция с дебаг-информацией
      */
-    public static function successWithDebug(): OperationOutcome
+    public static function successWithDebug(): ResultType
     {
         $result = ['status' => 'processed'];
         
@@ -45,16 +45,16 @@ class SomeService
             'request_id' => uniqid()
         ];
         
-        return Operation::success($result, null, $debug);
+        return Result::Success($result, null, $debug);
     }
 
     /**
      * Простая ошибка с кодом HTTP 400
      */
-    public static function simpleError(): OperationOutcome
+    public static function simpleError(): ResultType
     {
-        return Operation::error(
-            Operation::HTTP_BAD_REQUEST,
+        return Result::Failure(
+            Result::HTTP_BAD_REQUEST,
             'Invalid input parameters'
         );
     }
@@ -62,10 +62,10 @@ class SomeService
     /**
      * Ошибка с дебаг-информацией
      */
-    public static function errorWithDebug(): OperationOutcome
+    public static function errorWithDebug(): ResultType
     {
-        return Operation::error(
-            Operation::HTTP_NOT_FOUND,
+        return Result::Failure(
+            Result::HTTP_NOT_FOUND,
             'User not found',
             [
                 'searched_id' => 999,
@@ -78,12 +78,12 @@ class SomeService
     /**
      * Комплексный пример с обработкой бизнес-логики
      */
-    public static function processUser(int $userId): OperationOutcome
+    public static function processUser(int $userId): ResultType
     {
         // Валидация
         if ($userId <= 0) {
-            return Operation::error(
-                Operation::HTTP_BAD_REQUEST,
+            return Result::Failure(
+                Result::HTTP_BAD_REQUEST,
                 'Invalid user ID',
                 ['received_id' => $userId]
             );
@@ -94,8 +94,8 @@ class SomeService
             $user = self::fetchUserFromDb($userId);
             
             if (!$user) {
-                return Operation::error(
-                    Operation::HTTP_NOT_FOUND,
+                return Result::Failure(
+                    Result::HTTP_NOT_FOUND,
                     'User not found in database',
                     ['searched_id' => $userId]
                 );
@@ -113,11 +113,11 @@ class SomeService
                 'processed_at' => date('Y-m-d H:i:s')
             ];
             
-            return Operation::success($processedUser, $metrics, $debug);
+            return Result::Success($processedUser, $metrics, $debug);
             
         } catch (\Exception $e) {
-            return Operation::error(
-                Operation::HTTP_INTERNAL_SERVER_ERROR,
+            return Result::Failure(
+                Result::HTTP_INTERNAL_SERVER_ERROR,
                 'Processing failed',
                 [
                     'exception' => $e->getMessage(),
@@ -152,9 +152,9 @@ class SomeService
     /**
      * Демонстрация работы метода withMetric()
      */
-    public static function demoWithMetric(): OperationOutcome
+    public static function demoWithMetric(): ResultType
     {
-        $result = Operation::success(['initial' => 'data'])
+        $result = Result::Success(['initial' => 'data'])
             ->withMetric('start_time', microtime(true))
             ->withMetric('service', 'user_service');
             
@@ -165,12 +165,12 @@ class SomeService
     /**
      * Демонстрация работы методов then()
      */
-    public static function demoThen(): OperationOutcome
+    public static function demoThen(): ResultType
     {
-        return Operation::success(['id' => 1, 'name' => 'Alice'])
+        return Result::Success(['id' => 1, 'name' => 'Alice'])
             ->then(function($data) {
-                // Преобразуем данные и возвращаем новый OperationOutcome
-                return Operation::success([
+                // Преобразуем данные и возвращаем новый ResultType
+                return Result::Success([
                     'user' => $data,
                     'timestamp' => time()
                 ]);
@@ -179,12 +179,12 @@ class SomeService
     /**
      * Демонстрация работы методов then() и map()
      */
-    public static function demoThenAndMap(): OperationOutcome
+    public static function demoThenAndMap(): ResultType
     {
-        return Operation::success(['id' => 1, 'name' => 'Alice'])
+        return Result::Success(['id' => 1, 'name' => 'Alice'])
             ->then(function($data) {
-                // Преобразуем данные и возвращаем новый OperationOutcome
-                return Operation::success([
+                // Преобразуем данные и возвращаем новый ResultType
+                return Result::Success([
                     'user' => $data,
                     'timestamp' => time()
                 ]);
@@ -195,9 +195,9 @@ class SomeService
                 return $data;
             });
     }
-    public static function demoMap(): OperationOutcome
+    public static function demoMap(): ResultType
     {
-        return Operation::success(['id' => 1, 'name' => 'Alice'])
+        return Result::Success(['id' => 1, 'name' => 'Alice'])
             ->map(function($data) {
                 // Только преобразуем данные
                 $data['name'] = strtoupper($data['name']);
@@ -208,15 +208,15 @@ class SomeService
     /**
      * Демонстрация работы метода catch()
      */
-    public static function demoCatch(): OperationOutcome
+    public static function demoCatch(): ResultType
     {
-        return Operation::error(404, 'User not found')
+        return Result::Failure(404, 'User not found')
             ->catch(function($error, $code, $meta) {
                 /**
                  * We log the error and return a new result.
                  */
                 $debug['logged_at'] = date('Y-m-d H:i:s');
-                return Operation::error(
+                return Result::Failure(
                     $code,
                     "Handled: $error",
                     $debug
@@ -227,9 +227,9 @@ class SomeService
     /**
      * Демонстрация работы метода tap()
      */
-    public static function demoTap(): OperationOutcome
+    public static function demoTap(): ResultType
     {
-        return Operation::success(['value' => 42])
+        return Result::Success(['value' => 42])
             ->tap(function($result) {
                 /**
                  * Logging without changing the result
@@ -248,9 +248,9 @@ class SomeService
     /**
      * Демонстрация работы метода ensure()
      */
-    public static function demoEnsure(): OperationOutcome
+    public static function demoEnsure(): ResultType
     {
-        return Operation::success(['age' => 17])
+        return Result::Success(['age' => 17])
             ->ensure(
                 fn($data) => $data['age'] >= 18,
                 'User must be at least 18 years old',
@@ -261,10 +261,10 @@ class SomeService
     /**
      * Демонстрация работы метода merge()
      */
-    public static function demoMerge(): OperationOutcome
+    public static function demoMerge(): ResultType
     {
-        $userData = Operation::success(['id' => 1, 'name' => 'Alice']);
-        $userStats = Operation::success(['logins' => 42, 'last_login' => '2023-01-01']);
+        $userData = Result::Success(['id' => 1, 'name' => 'Alice']);
+        $userStats = Result::Success(['logins' => 42, 'last_login' => '2023-01-01']);
 
         return $userData->merge($userStats, function($data, $stats) {
             return array_merge($data, ['stats' => $stats]);
@@ -276,7 +276,7 @@ class SomeService
      */
     public static function demoToJson(): string
     {
-        $outcome = Operation::success(
+        $outcome = Result::Success(
             ['id' => 1, 'name' => 'Alice'],
             ['metrics' => ['time' => 12.3]],
             ['debug' => ['request_id' => 'abc123']]
@@ -286,7 +286,7 @@ class SomeService
         $json1 = $outcome->toJson();
 
         // Кастомное преобразование
-        $json2 = $outcome->toJson(function(OperationOutcome $outcome) {
+        $json2 = $outcome->toJson(function(ResultType $outcome) {
             return [
                 'user' => $outcome->result,
                 'execution_time' => $outcome->getMetric('time'),
@@ -300,9 +300,9 @@ class SomeService
     /**
      * Комплексный пример с цепочкой вызовов
      */
-    public static function demoChain(): OperationOutcome
+    public static function demoChain(): ResultType
     {
-        return Operation::success(['id' => 1, 'name' => ' alice '])
+        return Result::Success(['id' => 1, 'name' => ' alice '])
             ->withMetric('start_time', microtime(true))
             ->map(function($user) {
                 $user['name'] = trim($user['name']);
@@ -327,22 +327,22 @@ class SomeService
             ->withMetric('end_time', microtime(true));
     }
 
-    private static function fetchUserStats(int $userId): OperationOutcome
+    private static function fetchUserStats(int $userId): ResultType
     {
         // Имитация получения статистики
         if ($userId === 1) {
-            return Operation::success([
+            return Result::Success([
                 'logins' => 42,
                 'last_login' => '2023-01-01'
             ]);
         }
-        return Operation::error(404, 'Stats not found');
+        return Result::Failure(404, 'Stats not found');
     }
 
-    public static function demoMetricsAndDebug(): OperationOutcome
+    public static function demoMetricsAndDebug(): ResultType
     {
         // 1. Create successful operation with initial metrics and debug data
-        $operation = Operation::success(
+        $operation = Result::Success(
             result: ['user_id' => 123],
             metrics: ['start_time' => microtime(true)],
             debug: ['init_source' => 'user_service']

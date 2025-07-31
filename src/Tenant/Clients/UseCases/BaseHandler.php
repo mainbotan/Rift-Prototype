@@ -7,8 +7,8 @@ use App\Core\RepositoriesRouter;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Crypto\UidManager;
 use Symfony\Component\Stopwatch\Stopwatch;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 
 abstract class BaseHandler
 {
@@ -23,7 +23,7 @@ abstract class BaseHandler
     
     protected function initClientRepository(
         ServerRequestInterface $request
-    ): OperationOutcome
+    ): ResultType
      {
         $this->startTimer('repo_unit');
         

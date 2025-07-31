@@ -5,8 +5,8 @@ namespace App\Core\Tenant\UseCases\Deployment;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Database\Configurators\ConfiguratorInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 use Rift\Crypto\UidManager;
 use Rift\Metrics\Stopwatch\StopwatchManager;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -28,7 +28,7 @@ class DeployTenantSchema implements HandlerInterface {
         private StopwatchManager $stopwatchManager,
         private UidManager $uidManager
     ) { }
-    public function execute(ServerRequestInterface $request): OperationOutcome
+    public function execute(ServerRequestInterface $request): ResultType
     {
         $this->stopwatch->start('deploy_tenant.total');
         

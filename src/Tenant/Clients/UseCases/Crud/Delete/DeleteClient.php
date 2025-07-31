@@ -8,8 +8,8 @@ use App\Tenant\RepositoriesFactory;
 use App\Tenant\RepositoriesRouter;
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Rift\Metrics\Stopwatch\StopwatchManager;
 use Rift\Crypto\UidManager;
@@ -23,12 +23,12 @@ class DeleteClient implements HandlerInterface {
         private UidManager $uidManager
     ) { }
 
-    public function execute(ServerRequestInterface $request): OperationOutcome {
+    public function execute(ServerRequestInterface $request): ResultType {
         $this->stopwatch->start('client.delete.total');
 
         $paramsFromRoute = $request->getAttribute('params');
         if (!isset($paramsFromRoute['uid'])) {
-            return Operation::error(Operation::HTTP_BAD_REQUEST, 'The required uid route parameter is lost.');
+            return Result::Failure(Result::HTTP_BAD_REQUEST, 'The required uid route parameter is lost.');
         }
         $uid = $paramsFromRoute['uid'];
 
@@ -46,7 +46,7 @@ class DeleteClient implements HandlerInterface {
 
                         ->then(function ($result) use ($repository, $uid) {
                             if ($result !== true) {
-                                return Operation::error(Operation::HTTP_NOT_FOUND, "Client not found.");
+                                return Result::Failure(Result::HTTP_NOT_FOUND, "Client not found.");
                             }
                             $this->stopwatch->start('client.delete.repo_delete_client');
                             return $repository->deleteClientByUid($uid)
@@ -55,7 +55,7 @@ class DeleteClient implements HandlerInterface {
                 })
                 ->tap(fn() => $this->stopwatch->stop('client.delete.repo_request'))
                 ->catch(function($error, $code) {
-                    return Operation::error($code, "Delete operation failed: $error");
+                    return Result::Failure($code, "Delete operation failed: $error");
                 })
                 ->tap(fn() => $this->stopwatch->stop('client.delete.total'))
                 ->withMetric('stopwatch', $this->stopwatchManager->collectMetrics($this->stopwatch, 'client.delete.total'));

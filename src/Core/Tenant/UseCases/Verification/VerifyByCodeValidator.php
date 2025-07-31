@@ -3,7 +3,7 @@
 namespace App\Core\Tenant\UseCases\Verification;
 
 use Rift\Contracts\Validators\ValidatorInterface;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\ResultType;
 use Rift\Validator\SchemaValidator;
 
 class VerifyByCodeValidator implements ValidatorInterface {
@@ -19,7 +19,7 @@ class VerifyByCodeValidator implements ValidatorInterface {
         ]
     ];
 
-    public function validate(array $data): OperationOutcome {
+    public function validate(array $data): ResultType {
         return $this->schemaValidator->validate($this->requestBodySchema, $data);
     }
 }

@@ -4,13 +4,13 @@ namespace App\Core\Tenant\UseCases\Account;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Rift\Contracts\Handlers\HandlerInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 
 class EditPassword implements HandlerInterface {
-    public function execute(ServerRequestInterface $request): OperationOutcome 
+    public function execute(ServerRequestInterface $request): ResultType 
     {
         $uid = $request->getAttribute('uid');
-        return Operation::success($uid);
+        return Result::Success($uid);
     }
 }

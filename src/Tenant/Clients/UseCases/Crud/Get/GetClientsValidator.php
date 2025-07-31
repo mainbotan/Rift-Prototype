@@ -3,7 +3,7 @@
 namespace App\Tenant\Clients\UseCases\Crud\Get;
 
 use Rift\Contracts\Validators\ValidatorInterface;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\ResultType;
 use Rift\Validator\SchemaValidator;
 
 class GetClientsValidator implements ValidatorInterface {
@@ -26,7 +26,7 @@ class GetClientsValidator implements ValidatorInterface {
         ]
     ];
 
-    public function validate(array $data): OperationOutcome {
+    public function validate(array $data): ResultType {
         return $this->schemaValidator->validate($this->queryOptionsSchema, $data);
     }
 }

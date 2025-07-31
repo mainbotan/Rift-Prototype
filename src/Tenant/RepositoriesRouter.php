@@ -4,8 +4,8 @@ namespace App\Tenant;
 
 use Rift\Contracts\Database\Bridge\PDO\ConnectorInterface;
 use Rift\Contracts\Repositories\RepositoriesRouterInterface;
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 use Rift\Crypto\UidManager;
 
 class RepositoriesRouter {
@@ -15,10 +15,10 @@ class RepositoriesRouter {
         private ConnectorInterface $connector,
         private UidManager $uidManager
     ) { }
-    public function factory(string $uid): OperationOutcome {
+    public function factory(string $uid): ResultType {
         return $this->connector->createSchemaConnection(self::TENANT_SCHEMA_PREFIX . $this->uidManager->toSchemaName($uid))
             ->then(function($pdo) {
-                return Operation::success(
+                return Result::Success(
                     new RepositoriesFactory($pdo)
                 );
             });

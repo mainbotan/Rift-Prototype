@@ -2,12 +2,12 @@
 
 namespace App\Addition\Examples;
 
-use Rift\Core\Databus\Operation;
-use Rift\Core\Databus\OperationOutcome;
+use Rift\Core\Databus\Result;
+use Rift\Core\Databus\ResultType;
 
 class Example02 {
-    public static function getObject(): OperationOutcome {
-        return Operation::success(
+    public static function getObject(): ResultType {
+        return Result::Success(
             result: [
                 'id' => 10,
                 'name' => 'Alice'
